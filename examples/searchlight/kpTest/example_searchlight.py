@@ -85,10 +85,6 @@ print("sl.broadcast(labels)")
 sl.broadcast(labels)
 
 
-
-
-
-
 # 定义体素函数  Define voxel function
 def sfn(l, msk, myrad, bcast_var):
     import sklearn.svm
