@@ -7,13 +7,8 @@
 #SBATCH --mem-per-cpu=90G
 #SBATCH -n 4
 
-##SBATCH --mem=30G
-##SBATCH --time=24:00:00
-##SBATCH --mem-per-cpu=300G
-###SBATCH -n 4
-
 set -e
-cd /gpfs/milgram/project/turk-browne/projects/localize/analysis
+cd /gpfs/milgram/project/turk-browne/projects/brainiak
 . /gpfs/milgram/apps/hpc.rhel7/software/Python/Anaconda3/etc/profile.d/conda.sh
 conda activate brainiak
 
@@ -24,3 +19,12 @@ echo mpirun -n 4 python3 -u /gpfs/milgram/project/turk-browne/projects/brainiak/
 mpirun -n 4 python3 -u /gpfs/milgram/project/turk-browne/projects/brainiak/examples/searchlight/kpTest/example_searchlight.py ${SLURM_ARRAY_TASK_ID}
 
 echo "done"
+
+#示例用法  sbatch --array=1-1 /gpfs/milgram/project/turk-browne/projects/brainiak/examples/searchlight/kpTest/example_searchlight.sh
+
+
+
+##SBATCH --mem=30G
+##SBATCH --time=24:00:00
+##SBATCH --mem-per-cpu=300G
+###SBATCH -n 4

@@ -42,8 +42,8 @@ kernel_dim = 5
 weight = 1
 
 # 生成数据  Generate data
-data = np.random.random((dim, dim, dim, ntr)) if rank == 0 else None
-mask = np.zeros((dim, dim, dim), dtype=np.bool)
+data = np.random.random((dim, dim, dim, ntr)) if rank == 0 else None  # data 只有在rank==0的时候才有值, 其他的时候都是None
+mask = np.zeros((dim, dim, dim), dtype=np.bool)  # mask在任何rank都有值. 不光是在rank==0的时候.
 for i in range(dim):
     for j in range(dim):
         for k in range(dim):
@@ -52,7 +52,7 @@ for i in range(dim):
                 mask[i, j, k] = 1
 
 # 生成标签  Generate labels
-labels = np.random.choice([True, False], (ntr,)) if rank == 0 else None
+labels = np.random.choice([True, False], (ntr,)) if rank == 0 else None  # 只有当rank==0的时候labels才有值,其他时候都是None
 
 # 在随机数据中注入预测性区域  Inject predictive region in random data
 if rank == 0:
