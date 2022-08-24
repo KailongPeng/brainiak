@@ -21,36 +21,40 @@ from brainiak.searchlight.searchlight import Diamond
 
 """Distributed Searchlight Example
 example usage: mpirun -n 4 python3 example_searchlight.py
+
+分布式探照灯实例
+示例用法：mpirun -n 4 python3 example_searchlight.py
+
 """
 
 comm = MPI.COMM_WORLD
 rank = comm.rank
 size = comm.size
 
-# Dataset size parameters
+# 数据集大小参数  Dataset size parameters
 dim = 40
 ntr = 400
 maskrad = 15
 
-# Predictive point parameters
+# 预测点参数  Predictive point parameters
 pt = (23,23,23)
 kernel_dim = 5
 weight = 1
 
-# Generate data
+# 生成数据  Generate data
 data = np.random.random((dim,dim,dim,ntr)) if rank == 0 else None
 mask = np.zeros((dim,dim,dim), dtype=np.bool)
 for i in range(dim):
   for j in range(dim):
     for k in range(dim):
       dist = np.sqrt(((dim/2)-i)**2 + ((dim/2)-j)**2 + ((dim/2)-k)**2)
-      if(dist < maskrad):
+      if dist < maskrad:
         mask[i,j,k] = 1
 
-# Generate labels
+# 生成标签  Generate labels
 labels = np.random.choice([True, False], (ntr,)) if rank == 0 else None
 
-# Inject predictive region in random data
+# 在随机数据中注入预测性区域  Inject predictive region in random data
 if rank == 0:
   kernel = np.zeros((kernel_dim,kernel_dim,kernel_dim))
   for i in range(kernel_dim):
@@ -66,15 +70,15 @@ if rank == 0:
     else:
       data[pt[0]:pt[0]+kernel_dim,pt[1]:pt[1]+kernel_dim,pt[2]:pt[2]+kernel_dim,idx] -= kernel * weight
 
-# Create searchlight object
+# 创建探照灯对象  Create searchlight object
 sl = Searchlight(sl_rad=1, max_blk_edge=5, shape=Diamond,
                  min_active_voxels_proportion=0)
 
-# Distribute data to processes
+# 将数据分配给流程  Distribute data to processes
 sl.distribute([data], mask)
 sl.broadcast(labels)
 
-# Define voxel function
+# 定义体素函数  Define voxel function
 def sfn(l, msk, myrad, bcast_var):
   import sklearn.svm
   import sklearn.model_selection

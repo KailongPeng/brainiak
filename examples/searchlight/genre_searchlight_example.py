@@ -15,7 +15,7 @@ comm = MPI.COMM_WORLD
 rank = comm.rank
 size = comm.size
 
-# Generate random data
+# 生成随机数据 Generate random data
 if rank == 0:
     np.random.seed(0)
     data1_rand = np.random.rand(91,109,91,16)
@@ -35,7 +35,7 @@ if rank == 0:
     data1 = np.reshape(d1_reshape,(91,109,91,16))
     data2 = np.reshape(d2_reshape,(91,109,91,16))
 
-    # Flatten data, then zscore data, then reshape data back into MNI coordinate space
+    # 扁平化数据，然后Zscore数据，然后将数据重塑回MNI坐标空间  Flatten data, then zscore data, then reshape data back into MNI coordinate space
     data1 = stats.zscore(np.reshape(data1,(91*109*91,16)))
     data1 = np.reshape(data1,(91,109,91,16))
     data2 = stats.zscore(np.reshape(data2,(91*109*91,16)))
@@ -44,11 +44,11 @@ else:
     data1 = None
     data2 = None
 
-# Load mask 
+# 负载掩码  Load mask
 mask_img = load_img('MNI152_T1_2mm_brain_mask.nii')
 mask_img = mask_img.get_data()
 
-# Definte function that takes the difference between within vs. between genre comparisons
+# 定义一个函数，获取流派内与流派间比较的差异 Definte function that takes the difference between within vs. between genre comparisons
 def corr2_coeff(AB,msk,myrad,bcast_var):
     if not np.all(msk):
         return None
@@ -69,7 +69,7 @@ comm.Barrier()
 begin_time = time.time()
 comm.Barrier()
 
-# Create and run searchlight
+# 创建并运行探照灯  Create and run searchlight
 sl = Searchlight(sl_rad=1,max_blk_edge=5)
 sl.distribute([data1,data2],mask_img)
 sl.broadcast(None)
@@ -79,7 +79,7 @@ comm.Barrier()
 end_time = time.time()
 comm.Barrier()
 
-# Plot searchlight results
+# 绘制探照灯结果  Plot searchlight results
 if rank == 0:
     print('Searchlight Done: ', end_time - begin_time)
     maxval = np.max(global_outputs[np.not_equal(global_outputs,None)])
@@ -87,7 +87,7 @@ if rank == 0:
     global_outputs = np.array(global_outputs, dtype=np.float)
     print(global_outputs)
 
-    # Save searchlight images
+    # 保存探照灯图像  Save searchlight images
     out_dir = "searchlight_images"
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
