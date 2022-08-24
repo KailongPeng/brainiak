@@ -74,8 +74,13 @@ if rank == 0:
 sl = Searchlight(sl_rad=1, max_blk_edge=5, shape=Diamond,
                  min_active_voxels_proportion=0)
 
+print(f"data.shape={data.shape}")
+print(f"mask.shape={mask.shape}")
+print(f"labels.shape={labels.shape}")
 # 将数据分配给流程  Distribute data to processes
+print("sl.distribute([data], mask)")
 sl.distribute([data], mask)
+print("sl.broadcast(labels)")
 sl.broadcast(labels)
 
 
@@ -85,19 +90,21 @@ def sfn(l, msk, myrad, bcast_var):
     import sklearn.model_selection
     classifier = sklearn.svm.SVC(gamma='auto')
     data = l[0][msk, :].T
+    print(f"data.shape={data.shape}")
+    print(f"bcast_var.shape={bcast_var.shape}")
     return np.mean(sklearn.model_selection.cross_val_score(classifier, data, bcast_var, n_jobs=1))
 
 
 # Run searchlight
 global_outputs = sl.run_searchlight(sfn)
 
-# Visualize result
-if rank == 0:
-    print(global_outputs)
-    global_outputs = np.array(global_outputs, dtype=np.float)
-    import matplotlib.pyplot as plt
-
-    for (cnt, img) in enumerate(global_outputs):
-        plt.imshow(img, cmap='hot', vmin=0, vmax=1)
-        plt.savefig('img' + str(cnt) + '.png')
-        plt.clf()
+# # Visualize result
+# if rank == 0:
+#     print(global_outputs)
+#     global_outputs = np.array(global_outputs, dtype=np.float)
+#     import matplotlib.pyplot as plt
+#
+#     for (cnt, img) in enumerate(global_outputs):
+#         plt.imshow(img, cmap='hot', vmin=0, vmax=1)
+#         plt.savefig('img' + str(cnt) + '.png')
+#         plt.clf()
