@@ -50,6 +50,7 @@ for i in range(dim):
             dist = np.sqrt(((dim / 2) - i) ** 2 + ((dim / 2) - j) ** 2 + ((dim / 2) - k) ** 2)
             if dist < maskrad:
                 mask[i, j, k] = 1
+print(f"mask.shape={mask.shape}")
 
 # 生成标签  Generate labels
 labels = np.random.choice([True, False], (ntr,)) if rank == 0 else None  # 只有当rank==0的时候labels才有值,其他时候都是None
@@ -70,18 +71,22 @@ if rank == 0:
         else:
             data[pt[0]:pt[0] + kernel_dim, pt[1]:pt[1] + kernel_dim, pt[2]:pt[2] + kernel_dim, idx] -= kernel * weight
 
+    print(f"data.shape={data.shape}")
+    print(f"labels.shape={labels.shape}")
+
 # 创建探照灯对象  Create searchlight object
 sl = Searchlight(sl_rad=1, max_blk_edge=5, shape=Diamond,
                  min_active_voxels_proportion=0)
 
-print(f"data.shape={data.shape}")
-print(f"mask.shape={mask.shape}")
-print(f"labels.shape={labels.shape}")
 # 将数据分配给流程  Distribute data to processes
 print("sl.distribute([data], mask)")
 sl.distribute([data], mask)
 print("sl.broadcast(labels)")
 sl.broadcast(labels)
+
+
+
+
 
 
 # 定义体素函数  Define voxel function
