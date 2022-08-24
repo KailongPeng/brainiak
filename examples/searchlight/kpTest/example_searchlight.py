@@ -32,8 +32,14 @@ rank = comm.rank
 size = comm.size
 
 # 数据集大小参数  Dataset size parameters
+
 dim = 40
-ntr = 400
+
+# dim1 = 91
+# dim2 = 109
+# dim3 = 91
+
+ntr = 400  # 400   576
 maskrad = 15
 
 # 预测点参数  Predictive point parameters
@@ -51,6 +57,7 @@ for i in range(dim):
             if dist < maskrad:
                 mask[i, j, k] = 1
 print(f"mask.shape={mask.shape}")
+print(f"np.nansum(mask)={np.nansum(mask)}")
 
 # 生成标签  Generate labels
 labels = np.random.choice([True, False], (ntr,)) if rank == 0 else None  # 只有当rank==0的时候labels才有值,其他时候都是None
