@@ -59,6 +59,7 @@ mask = nib.load(
 affine_mat = mask.affine
 print(f"affine_mat.shape={affine_mat.shape}")
 mask = mask.get_fdata()
+print(f"mask.shape={mask.shape}")
 allMaskSum = np.nansum(mask)
 print('number of voxels in mask: {}'.format(allMaskSum))  # 239565
 
@@ -111,7 +112,10 @@ def sfn(l, msk, myrad, bcast_var):
     import sklearn.svm
     import sklearn.model_selection
     classifier = sklearn.svm.SVC(gamma='auto')
-    data = l[0][msk, :].T
+    print(f"l[0].shape={l[0].shape}")
+    print(f"msk.shape={msk.shape}")
+    # data = l[0][msk, :].T
+    data = l[0].reshape(msk.shape[0] * msk.shape[1] * msk.shape[2], l[0].shape[3]).T
     print(f"data.shape={data.shape}")
     print(f"bcast_var.shape={bcast_var.shape}")
     return np.mean(sklearn.model_selection.cross_val_score(classifier, data, bcast_var[:, 0], n_jobs=1))
